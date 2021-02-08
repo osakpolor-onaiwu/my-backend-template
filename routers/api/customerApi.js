@@ -19,15 +19,11 @@ const Customer = require('../../models/customer');
  *       required: true
  *       description: customer age
  *       example: 25
- *      dateJoined:
- *       type: date
- *       description: date joined
- *       example: "2020-08-23"
  */
 
 /**
  * @swagger
- * /foodblog/api/customers:
+ * /customers:
  *  get:
  *      description: Used to get to customers
  *      responses:
@@ -40,13 +36,37 @@ const Customer = require('../../models/customer');
 router.get('/', (req, res) => {
   Customer.find()
     .sort({ date: -1 })
-    .select('- __v', 'name age')
+    .select('-__v')
     .then((data) => res.json(data));
 });
 
 /**
  * @swagger
- * /foodblog/api/customers:
+ * /customers/{customer_id}:
+ *  get:
+ *   summary: get specific customer
+ *   description: Used to get specific customers
+ *   parameters:
+ *    - in: path
+ *      name: customer_id
+ *      schema:
+ *       type: string
+ *       required: true
+ *      description: id of customer
+ *      example: 6006ba43507334171076av53
+ *   responses:
+ *    200:
+ *     description: Successfully created
+ */
+router.get('/:id', (req, res) => {
+  Customer.findById(req.params.id)
+    .select('-__v')
+    .then((data) => res.json(data));
+});
+
+/**
+ * @swagger
+ * /customers:
  *  post:
  *   summary: create customer
  *   description: Used to post to customers
@@ -74,31 +94,47 @@ router.post('/', (req, res) => {
     age,
   });
 
-  newCustomer.save().then((data) => res.json(data));
+  newCustomer.save().then((data) => res.status(201).json(data));
 });
 
 /**
  * @swagger
- * /foodblog/api/customers/{_id}:
+ * /customers/{id}:
  *  put:
- *   summary: edit customer
- *   description: Used to post to customers
+ *   summary: update customer
+ *   description: update customer
+ *   consumes:
+ *    - application/json
+ *   produces:
+ *    - application/json
  *   parameters:
- *    - in: body
- *      name: customer
- *      description: body of customer
+ *    - in: path
+ *      name: id
  *      schema:
- *        $ref: '#/definitions/Customer'
+ *       type: string
+ *       required: true
+ *       description: id of customer
+ *       example: 6006ba43507334171076av58
+ *    - in: body
+ *      name: body
+ *      required: true
+ *      description: body object
+ *      schema:
+ *       $ref: '#/definitions/Customer'
  *   requestBody:
  *    content:
  *     application/json:
  *      schema:
  *       $ref: '#/definitions/Customer'
- *   responses:
- *    201:
- *     description: Successfully created
- *    400':
- *     description: Bad request
+ *   response:
+ *    200:
+ *     description: success
+ *     content:
+ *      application/json:
+ *       schema:
+ *        $ref: '#/definitions/Customer'
+ *    400:
+ *     description: bad request
  */
 router.put('/:id', (req, res) => {
   const { name, age } = req.body;

@@ -39,26 +39,31 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-app.use('/foodblog/api/customers', Customers);
+app.use('/customers', Customers);
 app.use('/user', User);
 app.use('/manufacturer', Manufacturers);
 
-//imports the key
-const db = config.get('mongoURI');
+// //imports the key
+// for online database
+// const db = config.get('mongoURI');
 
+//localdatabase
+const url = 'mongodb://127.0.0.1:27017/foodblog';
 //connects the db to mongodb
-mongoose
-  .connect(db, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
-  .then(() => {
-    console.log('db connected');
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+mongoose.connect(url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
+
+const db = mongoose.connection;
+db.once('open', () => {
+  console.log('db connected', url);
+});
+
+db.on('error', (err) => {
+  console.log('connection error', err);
+});
 
 const port = process.env.PORT || 5000;
 
