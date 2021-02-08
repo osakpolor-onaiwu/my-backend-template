@@ -126,7 +126,7 @@ router.post('/', (req, res) => {
  *     application/json:
  *      schema:
  *       $ref: '#/definitions/Customer'
- *   response:
+ *   responses:
  *    200:
  *     description: success
  *     content:
@@ -147,7 +147,26 @@ router.put('/:id', (req, res) => {
     .catch((err) => res.status(200).json(err));
 });
 
-// Delete;
+/**
+ * @swagger
+ * /customers/{customer_id}:
+ *  delete:
+ *   summary: update customer
+ *   description: update customer
+ *   parameters:
+ *    - in: path
+ *      name: customer_id
+ *      schema:
+ *       type: string
+ *       required: true
+ *       description: id of customer
+ *       example: 6006ba43507334171076av58
+ *   responses:
+ *    200:
+ *     description: sucess
+ *    404:
+ *     description: not found
+ */
 router.delete('/:id', (req, res) => {
   Customer.findByIdAndDelete(req.params.id)
     .then((data) => res.status(200).json({ success: true }))
